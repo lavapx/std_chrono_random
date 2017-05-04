@@ -45,3 +45,15 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.log
+*.obj
+chrono_random/Debug/chrono_random.tlog/chrono_random.lastbuildstate
+std.VC.db
+*.opendb
+Debug/chrono_random.pdb
+*.ilk
+Debug/chrono_random.exe
+*.pdb
+chrono_random/Debug/vc140.idb
+*.tlog
+.vs/std/v14/.suo
