@@ -1,4 +1,4 @@
-#include <chrono>
+﻿#include <chrono>
 #include <random>
 #include <iostream>
 #include <iomanip>
@@ -10,8 +10,48 @@
 #include <algorithm>
 #include <numeric>
 #include <conio.h>
+#include <fcntl.h>
+#include <io.h>
+//#include <Windows.h>
 
 using namespace std;
+
+
+
+#define clubUCode L"\u2663"
+#define diamondUCode L"\u2666"
+#define heartUCode L"\u2665"
+#define spadeUCode L"\u2660"
+
+enum SUIT
+{
+	CLUB,
+	DIAMOND,
+	HEART,
+	SPADE
+};
+
+struct card
+{
+	int rank;
+	SUIT suit;
+};
+
+struct suitSort
+{
+	bool operator()(const card& x, const card& y) const
+	{
+		return x.suit < y.suit;
+	}
+};
+
+struct rankSort
+{
+	bool operator()(const card& x, const card& y) const
+	{
+		return x.rank < y.rank;
+	}
+};
 
 #pragma region HELPER_FUNCTIONS
 
@@ -152,10 +192,19 @@ bool yesNoInput()
 	return ret;
 }
 
+void printUnicode(const wstring& s)
+{
+	_setmode(_fileno(stdout), _O_U16TEXT);
+	wcout << s;
+	_setmode(_fileno(stdout), _O_TEXT);
+
+}
 #pragma endregion
 
 int main()
 {
+
+
 
 #pragma region VARIABLES
 
@@ -202,10 +251,13 @@ int main()
 	int min;
 	int max;
 	int iter;
-
+	uniform_int_distribution<int> dist2;
 	// 6. standard random engine seeded
-	default_random_engine DeRaEn2;
+	default_random_engine DeRaEn2(chrono::steady_clock::now().time_since_epoch().count());
 	uniform_int_distribution<int> dist1(1, 10);
+
+	
+
 	int seed = 0;
 
 	// 7. dice roll
@@ -216,10 +268,34 @@ int main()
 	array<int, 4>::iterator smallest;
 	int sum;
 	
-	// 8. distributions
+	// 8. shuffle
+	default_random_engine shuffleEn;
+	array<card, 52> deck;
+	wstring club = clubUCode;
+	wstring diamond = diamondUCode;
+	wstring heart = heartUCode;
+	wstring spade = spadeUCode;
+	for (int i = 0; i < deck.size();i++) {
+		deck[i].rank = i%13+1;
+		switch (i/13)
+		{
+		case SUIT::CLUB:
+			deck[i].suit = CLUB;
+			break;
+		case SUIT::DIAMOND:
+			deck[i].suit = DIAMOND;
+			break;
+		case SUIT::HEART:
+			deck[i].suit = HEART;
+			break;
+		case SUIT::SPADE:
+			deck[i].suit = SPADE;
+			break;
+		default:
+			break;
+		}
 
-
-	// 9. engine comparisons
+	}
 
 
 	// menu and input
@@ -245,8 +321,7 @@ int main()
 			 << "\t\t5.\tRandom Number /w Benchmark\n"
 			 << "\t\t6.\tSeeded Random\n"
 			 << "\t\t7.\tDice Roll\n"
-			 << "\t\t8.\tSmooth Distribution\n"
-			 << "\t\t9.\tEngine Comparison\n\n"
+			 << "\t\t8.\tDeck Shuffle\n\n"
 		     << "\t0. Exit\n" << endl;
 	
 		do
@@ -264,54 +339,54 @@ int main()
 		case '1': // test durations output
 
 			cout << "Test Durations" << "\n"
-				 << "--------------" << "\n";
-			cout << "thirtySeconds is:\t\t\t" << thirtySeconds.count() << "\n";
-			cout << "3 * thirtySeconds is:\t\t\t" << (thirtySeconds * 3).count() << "\n\n";
+				 << "--------------" << "\n"
+				 << "thirtySeconds is:\t\t\t" << thirtySeconds.count() << "\n"
+				 << "3 * thirtySeconds is:\t\t\t" << (thirtySeconds * 3).count() << "\n\n"
 
-			cout << "fiveMinutes is:\t\t\t\t" << fiveMinutes.count() << "\n";
-			cout << "10 * fiveMinutes is:\t\t\t" << (10 * fiveMinutes).count() << "\n\n";
+				 << "fiveMinutes is:\t\t\t\t" << fiveMinutes.count() << "\n"
+				 << "10 * fiveMinutes is:\t\t\t" << (10 * fiveMinutes).count() << "\n\n"
 
-			cout << "twoHours is:\t\t\t\t" << twoHours.count() << "\n";
-			cout << "5 * twoHours is:\t\t\t" << (5 * twoHours).count() << "\n\n";
+				 << "twoHours is:\t\t\t\t" << twoHours.count() << "\n"
+				 << "5 * twoHours is:\t\t\t" << (5 * twoHours).count() << "\n\n"
 
-			cout << "sixtyFPS_Tick is:\t\t\t" << sixtyFPS_Tick.count() << "\n";
-			cout << "30 * sixtyFPS_Tick is:\t\t\t" << (30 * sixtyFPS_Tick).count() << "\n\n";
+				 << "sixtyFPS_Tick is:\t\t\t" << sixtyFPS_Tick.count() << "\n"
+				 << "30 * sixtyFPS_Tick is:\t\t\t" << (30 * sixtyFPS_Tick).count() << "\n\n"
 
-			cout << "day is:\t\t\t\t\t" << day.count() << "\n";
-			cout << "2 * day is:\t\t\t\t" << (2 * day).count() << "\n";
-			cout << "day - twoHours is:\t\t\t" << (day - twoHours).count() << "\n\n";
+				 << "day is:\t\t\t\t\t" << day.count() << "\n"
+				 << "2 * day is:\t\t\t\t" << (2 * day).count() << "\n"
+				 << "day - twoHours is:\t\t\t" << (day - twoHours).count() << "\n\n"
 
-			cout << "1 sixtyFPS_Tick is:\t\t\t" << chrono::duration_cast<sec>(sixtyFPS_Tick * 1).count() << "\tseconds\n";
-			cout << "1 sixtyFPS_Tick is:\t\t\t" << chrono::duration_cast<ms>(sixtyFPS_Tick * 1).count() << "\t\tmillisecconds\n\n";
+				 << "1 sixtyFPS_Tick is:\t\t\t" << chrono::duration_cast<sec>(sixtyFPS_Tick * 1).count() << "\tseconds\n"
+				 << "1 sixtyFPS_Tick is:\t\t\t" << chrono::duration_cast<ms>(sixtyFPS_Tick * 1).count() << "\t\tmillisecconds\n\n";
 
 			clearAdvance();
 			break;
 		case '2': // display clock stats
 		
 			cout << "System Clock" << "\n"
-					<< "------------" << "\n";
-			cout << "is steady:\t\t" << (chrono::system_clock::is_steady ? "yes" : "no") << "\n";
-			cout << "min:max duration:\t" << chrono::system_clock::duration::min().count() << ":" << chrono::system_clock::duration::max().count() << "\n";
-			cout << "duration type:\t\t" << typeid(chrono::system_clock::rep).name() << "\n";
-			cout << "seconds ratio:\t\t" << std::chrono::system_clock::period::num << "/" << std::chrono::system_clock::period::den << "\n";	
+				 << "------------" << "\n"
+				 << "is steady:\t\t" << (chrono::system_clock::is_steady ? "yes" : "no") << "\n"
+				 << "min:max duration:\t" << chrono::system_clock::duration::min().count() << ":" << chrono::system_clock::duration::max().count() << "\n"
+				 << "duration type:\t\t" << typeid(chrono::system_clock::rep).name() << "\n"
+				 << "seconds ratio:\t\t" << std::chrono::system_clock::period::num << "/" << std::chrono::system_clock::period::den << "\n";
 			nanoTick = chrono::system_clock::duration(1);
-			cout << "accuracy:\t\t" << nanoTick.count() << " ns\n";
+			cout << "accuracy:\t\t" << nanoTick.count() << " ns\n"
 
-			cout << "\nSteady Clock" << "\n"
-					<< "------------" << "\n";
-			cout << "is steady:\t\t" << (chrono::steady_clock::is_steady ? "yes" : "no") << "\n";
-			cout << "min:max duration:\t" << chrono::steady_clock::duration::min().count() << ":" << chrono::steady_clock::duration::max().count() << "\n";
-			cout << "duration type:\t\t" << typeid(chrono::steady_clock::rep).name() << "\n";
-			cout << "seconds ratio:\t\t" << std::chrono::steady_clock::period::num << "/" << std::chrono::steady_clock::period::den << "\n";
+				 << "\nSteady Clock" << "\n"
+				   << "------------" << "\n"
+				 << "is steady:\t\t" << (chrono::steady_clock::is_steady ? "yes" : "no") << "\n"
+				 << "min:max duration:\t" << chrono::steady_clock::duration::min().count() << ":" << chrono::steady_clock::duration::max().count() << "\n"
+				 << "duration type:\t\t" << typeid(chrono::steady_clock::rep).name() << "\n"
+				 << "seconds ratio:\t\t" << std::chrono::steady_clock::period::num << "/" << std::chrono::steady_clock::period::den << "\n";
 			nanoTick = chrono::steady_clock::duration(1);
-			cout << "accuracy:\t\t" << nanoTick.count() << " ns\n";
+			cout << "accuracy:\t\t" << nanoTick.count() << " ns\n"
 
-			cout << "\nHigh Res Clock" << "\n"
-					<< "--------------" << "\n";
-			cout << "is steady:\t\t" << (chrono::high_resolution_clock::is_steady ? "yes" : "no") << "\n";
-			cout << "min:max duration:\t" << chrono::high_resolution_clock::duration::min().count() << ":" << chrono::high_resolution_clock::duration::max().count() << "\n";
-			cout << "duration type:\t\t" << typeid(chrono::high_resolution_clock::rep).name() << "\n";
-			cout << "seconds ratio:\t\t" << std::chrono::high_resolution_clock::period::num << "/" << std::chrono::high_resolution_clock::period::den << "\n";
+				 << "\nHigh Res Clock" << "\n"
+				   << "--------------" << "\n"
+				 << "is steady:\t\t" << (chrono::high_resolution_clock::is_steady ? "yes" : "no") << "\n"
+				 << "min:max duration:\t" << chrono::high_resolution_clock::duration::min().count() << ":" << chrono::high_resolution_clock::duration::max().count() << "\n"
+				 << "duration type:\t\t" << typeid(chrono::high_resolution_clock::rep).name() << "\n"
+				 << "seconds ratio:\t\t" << std::chrono::high_resolution_clock::period::num << "/" << std::chrono::high_resolution_clock::period::den << "\n";
 			nanoTick = chrono::high_resolution_clock::duration(1);
 			cout << "accuracy:\t\t" << nanoTick.count() << " ns\n\n";
 
@@ -320,13 +395,13 @@ int main()
 		case '3':  // using ctime to output a date stamp
 
 			cout << "Date Stamp\n"
-				<< "----------\n";
+				 << "----------\n"
 
-			cout << "epoch:\t\t" << systemDateStamp(epoch_tp) << "\n\n";
+				 << "epoch:\t\t" << systemDateStamp(epoch_tp) << "\n\n"
 
-			cout << "program start:\t" << systemDateStamp(system_tp1) << "\n\n";
+				 << "program start:\t" << systemDateStamp(system_tp1) << "\n\n"
 
-			cout << "current:\t" << systemDateStamp(sysClock.now()) << "\n\n";
+				 << "current:\t" << systemDateStamp(sysClock.now()) << "\n\n";
 
 			clearAdvance();
 
@@ -339,19 +414,19 @@ int main()
 			chrono::seconds steady_result(chrono::duration_cast<chrono::seconds>(steady_tp2 - steady_tp1).count());
 
 			cout << "Session Time\n"
-				 << "------------\n";
+				 << "------------\n"
 
-			cout << "no cast system_clock:\t\t" << (system_tp2 - system_tp1).count() << "\n";
-			cout << "no cast steady_clock:\t\t" << (steady_tp2 - steady_tp1).count() << "\n";
-			cout << "no cast high_resolution:\t" << (highRes_tp2 - highRes_tp1).count() << "\n\n";
+				 << "no cast system_clock:\t\t" << (system_tp2 - system_tp1).count() << "\n"
+				 << "no cast steady_clock:\t\t" << (steady_tp2 - steady_tp1).count() << "\n"
+				 << "no cast high_resolution:\t" << (highRes_tp2 - highRes_tp1).count() << "\n\n"
 
-			cout << "seconds system_clock:\t\t" << chrono::duration_cast<sec> (system_tp2 - system_tp1).count() << "\n";
-			cout << "seconds steady_clock:\t\t" << chrono::duration_cast<sec>(steady_tp2 - steady_tp1).count() << "\n";
-			cout << "seconds high_resolution:\t" << chrono::duration_cast<sec>(highRes_tp2 - highRes_tp1).count() << "\n\n";
+				 << "seconds system_clock:\t\t" << chrono::duration_cast<sec> (system_tp2 - system_tp1).count() << "\n"
+				 << "seconds steady_clock:\t\t" << chrono::duration_cast<sec>(steady_tp2 - steady_tp1).count() << "\n"
+				 << "seconds high_resolution:\t" << chrono::duration_cast<sec>(highRes_tp2 - highRes_tp1).count() << "\n\n"
 
-			cout << "minutes system_clock:\t\t" << chrono::duration_cast<chrono::minutes> (system_tp2 - system_tp1).count() << "\n";
-			cout << "minutes steady_clock:\t\t" << chrono::duration_cast<chrono::minutes>(steady_tp2 - steady_tp1).count() << "\n";
-			cout << "minutes high_resolution:\t" << chrono::duration_cast<chrono::minutes>(highRes_tp2 - highRes_tp1).count() << "\n\n";
+				 << "minutes system_clock:\t\t" << chrono::duration_cast<chrono::minutes> (system_tp2 - system_tp1).count() << "\n"
+				 << "minutes steady_clock:\t\t" << chrono::duration_cast<chrono::minutes>(steady_tp2 - steady_tp1).count() << "\n"
+				 << "minutes high_resolution:\t" << chrono::duration_cast<chrono::minutes>(highRes_tp2 - highRes_tp1).count() << "\n\n";
 
 			cout << "formatted steady_clock:\t";
 				chrono::hours   hh = chrono::duration_cast<chrono::hours>(steady_result);
@@ -359,9 +434,9 @@ int main()
 				chrono::seconds ss = chrono::duration_cast<chrono::seconds>(steady_result % chrono::minutes(1));
 			
 		
-				cout << "     " << setfill('0') << setw(2) << hh.count() << ":"
-														   << setw(2) << mm.count() << ":"
-														   << setw(2) << ss.count() <<  "\n\n";
+			cout << "     " << setfill('0') << setw(2) << hh.count() << ":"
+													   << setw(2) << mm.count() << ":"
+													   << setw(2) << ss.count() <<  "\n\n";
 
 			clearAdvance();
 		
@@ -369,8 +444,8 @@ int main()
 		case '5': // default random engine initialization and timer
 
 			do {
-			cout << "Simple Random Number Timer\n"
-				 << "--------------------------\n";
+				cout << "Simple Random Number Timer\n"
+					 << "--------------------------\n";
 			
 				cout << "Enter min value:";
 				
@@ -394,14 +469,14 @@ int main()
 
 			} while (cont == false);
 			{ //uniform_int_distribution needs a scope because we're in a switch
-				uniform_int_distribution<int> dist1(min, max);
-			
+			//	uniform_int_distribution<int> dist1(min, max);
+				dist2.param(uniform_int<int>::param_type (min,max));
 
 				cout << "\n\nPrinting numbers...\n";
 				chrono::steady_clock::time_point start = steadyClock.now();
 				for(int i = 0; i< iter;i++)
 				{
-					cout << dist1(DeRaEn1)<< " ";
+					cout << dist2(DeRaEn1)<< " ";
 			
 				}
 				chrono::steady_clock::time_point end = steadyClock.now();
@@ -463,17 +538,71 @@ int main()
 			cont = false;
 			clearScreen();
 			break;
-		case '8': // distribution type comparisons
+		case '8': // shuffle
 
+			cout << "Deck Shuffle\n"
+				 << "------------\n";
+			cont = true;
+			do{
+				for(int i = 0; i<deck.size();i++)
+				{
+					cout << setw(2) << deck[i].rank;
+					switch (deck[i].suit)
+					{
+					case CLUB:
+						printUnicode(club);
+						break;
+					case DIAMOND:
+						printUnicode(diamond);
+						break;
+					case HEART:
+						printUnicode(heart);
+						break;
+					case SPADE:
+						printUnicode(spade);
+						break;
+					default:
+						break;
+					}
+					cout << "  ";
+					if ((i+1)%13 == 0)
+						cout << "\n";
 
+				}
+				cout << "\n";
+				cout << "1 - shuffle | 2 - reorder | 3 - exit \t";
+				do
+				{
+					menu = _getch();
+					if (isdigit(menu)) {
+						_putch(menu);
+					}
+				
+				} while (!isdigit(menu));
+				cout << "\n\n";
+				switch (menu) {
+					case '1':
+						shuffle(deck.begin(),deck.end(),shuffleEn);			
+						break;
+					case '2':
+						sort(deck.begin(), deck.end(), suitSort());
+						for(int i=0; i<4;i++)
+						{
+							sort(deck.begin()+(i*13), deck.begin()+((i+1)*13), rankSort());
+						}						
+						break;
+					case '3':
+						cont = false;
+						break;
+					default:
+						break;
+				}
+			} while (cont == true);
 
+			cont = false;
+			clearScreen();
 			break;
-
-		case '9': // random engine type comparisons
-
-
-
-			break;
+	
 		default:
 			break;
 
