@@ -9,15 +9,13 @@
 #include <array>
 #include <algorithm>
 #include <numeric>
-#include <conio.h>
-#include <fcntl.h>
-#include <io.h>
-//#include <Windows.h>
+#include <conio.h> // for _getch() & _putch()
+#include <fcntl.h> // for displaying unicode in windows console
+#include <io.h> // for displaying unicode in windows console
 
 using namespace std;
 
-
-
+// wide unicode card suits
 #define clubUCode L"\u2663"
 #define diamondUCode L"\u2666"
 #define heartUCode L"\u2665"
@@ -37,24 +35,7 @@ struct card
 	SUIT suit;
 };
 
-struct suitSort
-{
-	bool operator()(const card& x, const card& y) const
-	{
-		return x.suit < y.suit;
-	}
-};
-
-struct rankSort
-{
-	bool operator()(const card& x, const card& y) const
-	{
-		return x.rank < y.rank;
-	}
-};
-
-#pragma region HELPER_FUNCTIONS
-
+#pragma region FUNCTIONS
 void clearScreen()
 {
 	system("CLS");
@@ -120,7 +101,6 @@ std::string systemDateStamp(const std::chrono::system_clock::time_point& tp)
 	ds.resize(ds.size() - 1);            
 	return ds;
 }
-
 
 int numericInput(int maxLength)
 {
@@ -194,11 +174,27 @@ bool yesNoInput()
 
 void printUnicode(const wstring& s)
 {
-	_setmode(_fileno(stdout), _O_U16TEXT);
+	_setmode(_fileno(stdout), _O_U16TEXT); //set windows console to wide unicode
 	wcout << s;
-	_setmode(_fileno(stdout), _O_TEXT);
+	_setmode(_fileno(stdout), _O_TEXT); // return to standard
 
 }
+//card sort functors
+struct suitSort
+{
+	bool operator()(const card& x, const card& y) const
+	{
+		return x.suit < y.suit;
+	}
+};
+
+struct rankSort
+{
+	bool operator()(const card& x, const card& y) const
+	{
+		return x.rank < y.rank;
+	}
+};
 #pragma endregion
 
 int main()
@@ -252,12 +248,10 @@ int main()
 	int max;
 	int iter;
 	uniform_int_distribution<int> dist2;
+
 	// 6. standard random engine seeded
 	default_random_engine DeRaEn2(chrono::steady_clock::now().time_since_epoch().count());
 	uniform_int_distribution<int> dist1(1, 10);
-
-	
-
 	int seed = 0;
 
 	// 7. dice roll
@@ -271,10 +265,12 @@ int main()
 	// 8. shuffle
 	default_random_engine shuffleEn;
 	array<card, 52> deck;
+	//wide unicode strings
 	wstring club = clubUCode;
 	wstring diamond = diamondUCode;
 	wstring heart = heartUCode;
 	wstring spade = spadeUCode;
+	//deck initialization
 	for (int i = 0; i < deck.size();i++) {
 		deck[i].rank = i%13+1;
 		switch (i/13)
@@ -296,8 +292,6 @@ int main()
 		}
 
 	}
-
-
 	// menu and input
 	char temp;
 	char menu = '0';
@@ -602,16 +596,9 @@ int main()
 			cont = false;
 			clearScreen();
 			break;
-	
 		default:
 			break;
-
-
 		}
-
-
-
-
 
 	} while (menu != '0');
 
@@ -626,4 +613,3 @@ int main()
 
     return 0;
 }
-
