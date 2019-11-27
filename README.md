@@ -1,7 +1,9 @@
 # std_chrono_random
 A console app for tutorials on std::chrono and random. Accompanying tutorial explaining all code and concepts in detail can be found [here for chrono](http://www.lavaxp.net/cpp-standard-library-in-game-dev-1-std-chrono/) and [here for random](http://www.lavaxp.net/cpp-standard-library-in-game-dev-2-std-random/).
 
-![preview](http://www.lavaxp.net/wp-content/uploads/2017/04/menu-1-1.png)
+![menu-1](https://user-images.githubusercontent.com/27367475/69744539-39bde680-10f5-11ea-96e8-b92032c47a22.png)
+
+![suitedShuffle](https://user-images.githubusercontent.com/27367475/69744424-fe231c80-10f4-11ea-9240-daad8cde4890.png)
 
 ## Built With
 
